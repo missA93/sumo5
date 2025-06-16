@@ -8,15 +8,21 @@ import pandas as pd
 import numpy as np
 import xml.etree.ElementTree as xml_parser
 
+# from trafic_light import TraficLight, TraficState
+
 sumo_port = 8813
 step = 0
 counter = 0
+jam_lengths = []
+traffic_light_phases = []
+traffic_light_id = "J9"
+edge_id = "E0"
 charging_vehicles = []
 modified_vehicles = []
 vehicles_log = []
 traci.start(
     port=sumo_port,
-    cmd=["sumo-gui", "-c", "chargstation.sumocfg", "--quit-on-end"],
+    cmd=["sumo-gui", "-c", "chargstation.sumocfg", "--random", "--quit-on-end"],
 )
 direction_flag = True
 while step < 1000:
@@ -55,10 +61,10 @@ while step < 1000:
             current_battery <= vehicle_battery_capcity * 0.15
             and not vehicle_id in charging_vehicles
         ):
-            if traci.vehicle.getPosition(vehicle_id)[0] < 57:
+            if traci.vehicle.getPosition(vehicle_id)[0] < 110:
                 try:
-                    selected_station_id = "cs_1"
-                    traci.vehicle.setRoute(vehicle_id, ["E0_1", "E3", "E4", "E2"])
+                    selected_station_id = "cs_0"
+                    traci.vehicle.setRoute(vehicle_id, ["E0", "E1", "E2", "E3"])
                     traci.vehicle.setChargingStationStop(
                         vehicle_id,
                         selected_station_id,
@@ -116,3 +122,48 @@ plt.ylabel("Number of Vehicles")
 plt.title("Histogram of Energy Consumption per Vehicle")
 plt.grid(True)
 plt.show()
+
+
+def count_vehicles_at_red_light(traci, traffic_light_pos, distance_threshold=50):
+    count = 0
+    vehicles_behind_traffic = []
+    for vehicle_id in traci.vehicle.getIDList():
+        vehicle_pos = traci.vehicle.getPosition(vehicle_id)
+        dist = traci.simulation.getDistance2D(
+            traffic_light_pos[0], traffic_light_pos[1], vehicle_pos[0], vehicle_pos[1]
+        )
+        if (
+            traffic_light_pos[0] > vehicle_pos[0]
+            and traci.vehicle.getSpeed(vehicle_id) < 2
+        ):
+
+            count += 1
+
+    return count
+
+    traffic_jam_level = count_vehicles_at_red_light(
+        traci_connection, traffic_light_position
+    )
+
+    # # Traffic light control logic
+    # if traffic_jam_level >= TrafficState.High.value or keep_green_light:
+    #     keep_green_light = True
+    #     if waiting_steps_counter >= TrafficState.High.value * 1.5:
+    #         keep_green_light = False
+    #         waiting_steps_counter = 0
+    #     else:
+    #         waiting_steps_counter += 1
+    #     traci_connection.trafficlight.setPhase(
+    #         traffic_light_id, TrafficLightPhase.Green.value
+    #     )
+    # else:
+    #     traci_connection.trafficlight.setPhase(
+    #         traffic_light_id, TrafficLightPhase.Red.value
+    #     )
+
+    # # Record current state
+    # current_phase = traci_connection.trafficlight.getPhase(traffic_light_id)
+    # traffic_history.append(traffic_jam_level)
+    # traffic_light_phase_history.append("Red" if current_phase == 2 else "Green")
+
+    # current_step += 1
