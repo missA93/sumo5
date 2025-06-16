@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2025-06-14 13:49:42 by Eclipse SUMO netedit Version 1.22.0
+-->
+
+<additional xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/additional_file.xsd">
+    <!-- StoppingPlaces -->
+    <chargingStation id="cs_1" lane="E4_1" startPos="27.11" endPos="37.11" power="30000" />
+    <chargingStation id="cs_2" lane="E8_0" startPos="32.49" endPos="42.49" power="30000" />
+</additional>
